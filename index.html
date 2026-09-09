@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiauMenú - Tracker Nutricional para Gatos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fffaf0; /* Soft orange/cream background */
+        }
+        /* Custom scrollbar for small lists */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#f97316', // Orange-500
+                        secondary: '#14b8a6', // Teal-500
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="text-slate-700 min-h-screen pb-12">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-orange-100 sticky top-0 z-10">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-primary text-xl">
+                    <i class="fa-solid fa-cat"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-800 leading-tight">MiauMenú</h1>
+                    <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Nutrición & Horarios</p>
+                </div>
+            </div>
+            <button onclick="resetData()" class="text-sm text-red-400 hover:text-red-600 font-semibold flex items-center gap-2 transition-colors">
+                <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">Reiniciar Datos</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 mt-8">
+        
+        <!-- Notificación toast (oculta por defecto) -->
+        <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-lg transform transition-transform duration-300 translate-y-20 opacity-0 z-50 flex items-center gap-3">
+            <i class="fa-solid fa-circle-check text-green-400"></i>
+            <span id="toast-message">Guardado con éxito</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- COLUMNA IZQUIERDA (Perfil y Marcas) -->
+            <div class="lg:col-span-5 space-y-8">
+                
+                <!-- Sección 1: Análisis del Gato -->
+                <section class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-[100px] -z-0"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-3 mb-6">
+                            <i class="fa-solid fa-id-card text-2xl text-primary"></i>
+                            <h2 class="text-xl font-bold text-slate-800">Perfil del Gato</h2>
+                        </div>
+
+                        <form id="profile-form" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-600 mb-1">Nombre</label>
+                                    <input type="text" id="cat-name" placeholder="Ej. Michi" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-600 mb-1">Raza</label>
+                                    <input type="text" id="cat-breed" placeholder="Ej. Europeo" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-600 mb-1">Peso (kg)</label>
+                                    <input type="number" step="0.1" id="cat-weight" placeholder="Ej. 4.5" required class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-600 mb-1">Actividad</label>
+                                    <select id="cat-activity" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm">
+                                        <option value="1.2">Esterilizado / Sedentario (1.2)</option>
+                                        <option value="1.4">Activo / Intacto (1.4)</option>
+                                        <option value="0.8">Pérdida de peso (0.8)</option>
+                                        <option value="2.5">Gatito en crecimiento (2.5)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full mt-2 bg-primary hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-calculator"></i> Calcular Necesidades
+                            </button>
+                        </form>
+
+                        <div id="profile-result" class="mt-5 hidden bg-orange-50 border border-orange-100 p-4 rounded-xl text-center">
+                            <p class="text-sm text-slate-600 mb-1">Calorías diarias recomendadas para <span id="display-name" class="font-bold">tu gato</span>:</p>
+                            <p class="text-3xl font-extrabold text-primary" id="display-kcal">0 <span class="text-lg text-orange-400 font-bold">kcal</span></p>
+                            <p class="text-xs text-slate-500 mt-2"><i class="fa-solid fa-info-circle"></i> Basado en requerimiento energético en reposo (RER).</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección 2: Base de datos de Comida -->
+                <section class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-bowl-food text-2xl text-secondary"></i>
+                            <h2 class="text-xl font-bold text-slate-800">Marcas de Comida</h2>
+                        </div>
+                        <span class="bg-teal-50 text-teal-600 text-xs font-bold px-2 py-1 rounded-lg" id="food-count">0 guardadas</span>
+                    </div>
+
+                    <form id="food-form" class="space-y-4 mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="col-span-2">
+                                <label class="block text-xs font-bold text-slate-500 mb-1">Nombre / Marca</label>
+                                <input type="text" id="food-brand" placeholder="Ej. Orijen Fit & Trim" required class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-secondary">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">Tipo</label>
+                                <select id="food-type" class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-secondary">
+                                    <option value="Seca">Seca (Pienso)</option>
+                                    <option value="Húmeda">Húmeda (Lata/Sobres)</option>
+                                    <option value="Snack">Snack</option>
+                                    <option value="Casera">Casera/Barf</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">Kcal por 100g</label>
+                                <input type="number" step="0.1" id="food-kcal" placeholder="Ej. 370" required class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-secondary">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-secondary hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors">
+                            <i class="fa-solid fa-plus mr-1"></i> Añadir Comida a la despensa
+                        </button>
+                    </form>
+
+                    <!-- Lista de Comidas -->
+                    <div id="food-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2">
+                        <!-- Las comidas se renderizarán aquí -->
+                        <p class="text-sm text-slate-400 text-center py-4 italic">No has añadido ninguna comida aún. Añade los alimentos que suele comer tu gato arriba.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- COLUMNA DERECHA (Progreso y Horario) -->
+            <div class="lg:col-span-7 space-y-8">
+                
+                <!-- Sección 3: Análisis y Progreso Diario -->
+                <section class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-6 shadow-lg text-white relative overflow-hidden">
+                    <i class="fa-solid fa-chart-pie absolute -right-6 -bottom-6 text-9xl text-white opacity-5"></i>
+                    
+                    <h2 class="text-xl font-bold mb-6 flex items-center gap-3">
+                        <i class="fa-solid fa-chart-simple text-orange-400"></i> Análisis Diario
+                    </h2>
+
+                    <div class="flex items-end justify-between mb-2">
+                        <div>
+                            <p class="text-slate-300 text-sm font-semibold mb-1">Kcal Consumidas / Objetivo</p>
+                            <p class="text-3xl font-black text-white"><span id="progress-current">0</span> <span class="text-lg text-slate-400 font-bold">/ <span id="progress-goal">0</span> kcal</span></p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-4xl font-black text-orange-400" id="progress-percent">0%</p>
+                        </div>
+                    </div>
+
+                    <!-- Barra de progreso -->
+                    <div class="h-6 bg-slate-700 rounded-full mt-4 overflow-hidden relative">
+                        <div id="progress-bar" class="h-full bg-gradient-to-r from-orange-400 to-primary rounded-full transition-all duration-700 ease-out flex items-center justify-end px-2" style="width: 0%;">
+                            <i class="fa-solid fa-cat text-white text-xs opacity-70"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Mensaje dinámico de progreso -->
+                    <p id="progress-msg" class="text-sm text-slate-300 mt-4 text-center font-medium bg-slate-800 py-2 rounded-xl border border-slate-700">
+                        <i class="fa-solid fa-bell text-orange-400 mr-1"></i> Configura el perfil para ver el objetivo diario.
+                    </p>
+                </section>
+
+                <!-- Sección 4: Calendario / Horarios -->
+                <section class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-regular fa-calendar-check text-2xl text-indigo-500"></i>
+                            <h2 class="text-xl font-bold text-slate-800">Horario de Comidas</h2>
+                        </div>
+                    </div>
+
+                    <!-- Formulario Nuevo Horario -->
+                    <form id="schedule-form" class="flex flex-col sm:flex-row gap-3 mb-8 bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
+                        <div class="w-full sm:w-1/4">
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Hora</label>
+                            <input type="time" id="meal-time" required class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-400 font-bold text-slate-700">
+                        </div>
+                        <div class="w-full sm:w-2/4">
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Comida</label>
+                            <select id="meal-food" required class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-400">
+                                <option value="" disabled selected>Selecciona marca...</option>
+                                <!-- Se llena dinámicamente -->
+                            </select>
+                        </div>
+                        <div class="w-full sm:w-1/4">
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Gramos (g)</label>
+                            <input type="number" id="meal-amount" min="1" placeholder="Ej. 40" required class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-400">
+                        </div>
+                        <div class="w-full sm:w-auto flex items-end">
+                            <button type="submit" class="w-full h-[38px] bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-4 rounded-lg text-sm transition-colors">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Lista del Calendario Diario -->
+                    <div class="relative">
+                        <!-- Linea de tiempo visual -->
+                        <div class="absolute left-[39px] top-4 bottom-4 w-0.5 bg-indigo-100 hidden sm:block"></div>
+                        
+                        <div id="schedule-list" class="space-y-4">
+                            <!-- Los horarios se renderizan aquí -->
+                            <div class="text-center py-8">
+                                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 text-slate-300 mb-3 text-2xl">
+                                    <i class="fa-regular fa-clock"></i>
+                                </div>
+                                <p class="text-slate-500 font-semibold">Aún no hay comidas programadas</p>
+                                <p class="text-sm text-slate-400">Añade raciones al menú de hoy.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- ESTADO DE LA APLICACIÓN ---
+        let appData = {
+            profile: {
+                name: '',
+                breed: '',
+                weight: null,
+                activity: '1.2',
+                dailyGoal: 0
+            },
+            foods: [], // { id, brand, type, kcal }
+            schedule: [] // { id, time, foodId, amount, totalKcal }
+        };
+
+        // --- INICIALIZACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            setupEventListeners();
+            updateAllUI();
+        });
+
+        function loadData() {
+            const saved = localStorage.getItem('miauMenuData');
+            if (saved) {
+                appData = JSON.parse(saved);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('miauMenuData', JSON.stringify(appData));
+            updateAllUI();
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function resetData() {
+            // Reemplazamos confirm() por un modal custom o UI, pero para simplificar sin confirm(), 
+            // usar un reinicio con doble clic o simplemente resetear.
+            appData = {
+                profile: { name: '', breed: '', weight: null, activity: '1.2', dailyGoal: 0 },
+                foods: [],
+                schedule: []
+            };
+            saveData();
+            document.getElementById('profile-form').reset();
+            showToast("Datos borrados. Empezando de cero.");
+        }
+
+        // --- STREAMING_CHUNK: Programando el cálculo de calorías y perfil... ---
+        function setupEventListeners() {
+            // Perfil Submit
+            document.getElementById('profile-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const weight = parseFloat(document.getElementById('cat-weight').value);
+                const activity = parseFloat(document.getElementById('cat-activity').value);
+                
+                // Fórmula RER (Requerimiento Energético en Reposo): 70 * (Peso en kg ^ 0.75)
+                const rer = 70 * Math.pow(weight, 0.75);
+                const dailyKcal = Math.round(rer * activity);
+
+                appData.profile = {
+                    name: document.getElementById('cat-name').value || 'Tu gato',
+                    breed: document.getElementById('cat-breed').value,
+                    weight: weight,
+                    activity: document.getElementById('cat-activity').value,
+                    dailyGoal: dailyKcal
+                };
+                
+                saveData();
+                showToast("Perfil actualizado y calorías calculadas");
+            });
+
+            // Comida Submit
+            document.getElementById('food-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newFood = {
+                    id: Date.now().toString(),
+                    brand: document.getElementById('food-brand').value,
+                    type: document.getElementById('food-type').value,
+                    kcal: parseFloat(document.getElementById('food-kcal').value)
+                };
+                
+                appData.foods.push(newFood);
+                document.getElementById('food-form').reset();
+                saveData();
+                showToast("Nueva marca añadida a la despensa");
+            });
+
+            // Horario Submit
+            document.getElementById('schedule-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const foodId = document.getElementById('meal-food').value;
+                if (!foodId) {
+                    showToast("Por favor, selecciona una comida");
+                    return;
+                }
+
+                const food = appData.foods.find(f => f.id === foodId);
+                const amount = parseFloat(document.getElementById('meal-amount').value);
+                
+                // Cálculo: (kcal por 100g / 100) * gramos
+                const mealKcal = Math.round((food.kcal / 100) * amount);
+
+                const newMeal = {
+                    id: Date.now().toString(),
+                    time: document.getElementById('meal-time').value,
+                    foodId: foodId,
+                    amount: amount,
+                    totalKcal: mealKcal
+                };
+
+                appData.schedule.push(newMeal);
+                document.getElementById('schedule-form').reset();
+                saveData();
+                showToast("Comida añadida al horario");
+            });
+        }
+
+        function deleteFood(id) {
+            appData.foods = appData.foods.filter(f => f.id !== id);
+            // También deberíamos eliminar o alertar si hay horarios con esta comida
+            appData.schedule = appData.schedule.filter(s => s.foodId !== id);
+            saveData();
+            showToast("Marca eliminada");
+        }
+
+        function deleteMeal(id) {
+            appData.schedule = appData.schedule.filter(s => s.id !== id);
+            saveData();
+            showToast("Comida removida del horario");
+        }
+
+        // --- STREAMING_CHUNK: Conectando la interfaz con los datos interactivos... ---
+        function updateAllUI() {
+            renderProfile();
+            renderFoods();
+            renderSchedule();
+            renderProgress();
+        }
+
+        function renderProfile() {
+            if (appData.profile.weight) {
+                document.getElementById('cat-name').value = appData.profile.name !== 'Tu gato' ? appData.profile.name : '';
+                document.getElementById('cat-breed').value = appData.profile.breed;
+                document.getElementById('cat-weight').value = appData.profile.weight;
+                document.getElementById('cat-activity').value = appData.profile.activity;
+                
+                document.getElementById('display-name').textContent = appData.profile.name;
+                document.getElementById('display-kcal').innerHTML = `${appData.profile.dailyGoal} <span class="text-lg text-orange-400 font-bold">kcal</span>`;
+                document.getElementById('profile-result').classList.remove('hidden');
+            } else {
+                document.getElementById('profile-result').classList.add('hidden');
+            }
+        }
+
+        function renderFoods() {
+            const list = document.getElementById('food-list');
+            const select = document.getElementById('meal-food');
+            
+            document.getElementById('food-count').textContent = `${appData.foods.length} guardadas`;
+            
+            if (appData.foods.length === 0) {
+                list.innerHTML = '<p class="text-sm text-slate-400 text-center py-4 italic">No has añadido ninguna comida aún.</p>';
+                select.innerHTML = '<option value="" disabled selected>Añade una marca primero</option>';
+                select.disabled = true;
+                return;
+            }
+
+            select.disabled = false;
+            list.innerHTML = '';
+            select.innerHTML = '<option value="" disabled selected>Selecciona marca...</option>';
+
+            appData.foods.forEach(food => {
+                // Icono según tipo
+                let icon = 'fa-bone';
+                if (food.type === 'Húmeda') icon = 'fa-fish';
+                if (food.type === 'Seca') icon = 'fa-cubes-stacked';
+                if (food.type === 'Casera') icon = 'fa-drumstick-bite';
+
+                // Añadir a la lista visual
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-secondary/30 transition-colors';
+                item.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-sm">
+                            <i class="fa-solid ${icon}"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-slate-700">${food.brand}</p>
+                            <p class="text-xs text-slate-500">${food.type} &bull; <span class="font-semibold text-secondary">${food.kcal} kcal/100g</span></p>
+                        </div>
+                    </div>
+                    <button onclick="deleteFood('${food.id}')" class="text-slate-300 hover:text-red-500 transition-colors px-2">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                `;
+                list.appendChild(item);
+
+                // Añadir al selector del horario
+                const option = document.createElement('option');
+                option.value = food.id;
+                option.textContent = `${food.brand} (${food.type})`;
+                select.appendChild(option);
+            });
+        }
+
+        function renderSchedule() {
+            const list = document.getElementById('schedule-list');
+            
+            if (appData.schedule.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 text-slate-300 mb-3 text-2xl">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <p class="text-slate-500 font-semibold">Aún no hay comidas programadas</p>
+                        <p class="text-sm text-slate-400">Añade raciones al menú de hoy.</p>
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = '';
+            
+            // Ordenar por hora
+            const sortedSchedule = [...appData.schedule].sort((a, b) => a.time.localeCompare(b.time));
+
+            sortedSchedule.forEach((meal) => {
+                const food = appData.foods.find(f => f.id === meal.foodId);
+                if (!food) return; // Por si se borró la comida
+
+                const item = document.createElement('div');
+                item.className = 'relative flex items-center gap-4 sm:gap-6 bg-white sm:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border sm:border-0 border-slate-100 shadow-sm sm:shadow-none';
+                item.innerHTML = `
+                    <!-- Indicador visual de tiempo -->
+                    <div class="hidden sm:flex flex-col items-center z-10 w-20">
+                        <span class="text-lg font-black text-slate-700">${meal.time}</span>
+                    </div>
+                    <div class="hidden sm:block absolute left-[35px] w-2 h-2 rounded-full bg-indigo-500 z-10 ring-4 ring-white"></div>
+                    
+                    <!-- Tarjeta de comida -->
+                    <div class="flex-1 bg-white sm:bg-slate-50 sm:border border-slate-100 p-3 sm:p-4 rounded-2xl flex items-center justify-between sm:hover:shadow-md transition-shadow">
+                        <div class="flex items-center gap-4">
+                            <div class="sm:hidden text-lg font-black text-indigo-500 bg-indigo-50 px-2 py-1 rounded-lg">
+                                ${meal.time}
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-800 text-sm sm:text-base">${food.brand}</p>
+                                <p class="text-xs sm:text-sm text-slate-500 font-medium">Ración: <span class="text-slate-700 font-bold">${meal.amount}g</span></p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div class="text-right">
+                                <span class="block text-sm sm:text-lg font-black text-orange-500">+${meal.totalKcal} kcal</span>
+                            </div>
+                            <button onclick="deleteMeal('${meal.id}')" class="w-8 h-8 rounded-full bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center">
+                                <i class="fa-solid fa-xmark text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function renderProgress() {
+            const goal = appData.profile.dailyGoal;
+            document.getElementById('progress-goal').textContent = goal || '0';
+            
+            const currentKcal = appData.schedule.reduce((acc, meal) => acc + meal.totalKcal, 0);
+            document.getElementById('progress-current').textContent = currentKcal;
+
+            const percentEl = document.getElementById('progress-percent');
+            const bar = document.getElementById('progress-bar');
+            const msg = document.getElementById('progress-msg');
+
+            if (goal > 0) {
+                let percent = Math.round((currentKcal / goal) * 100);
+                percentEl.textContent = `${percent}%`;
+                
+                // Lógica visual de la barra
+                let barWidth = percent > 100 ? 100 : percent;
+                bar.style.width = `${barWidth}%`;
+
+                // Cambiar colores y mensajes según el estado
+                bar.className = 'h-full rounded-full transition-all duration-700 ease-out flex items-center justify-end px-2'; // Reset
+                
+                if (percent === 0) {
+                    msg.innerHTML = '<i class="fa-regular fa-face-frown text-orange-400 mr-1"></i> Aún no ha comido nada.';
+                    bar.classList.add('bg-slate-300');
+                } else if (percent < 90) {
+                    msg.innerHTML = '<i class="fa-solid fa-utensils text-orange-400 mr-1"></i> Va en buen camino.';
+                    bar.classList.add('bg-gradient-to-r', 'from-orange-400', 'to-primary');
+                } else if (percent <= 110) {
+                    msg.innerHTML = '<i class="fa-solid fa-cat text-green-400 mr-1"></i> ¡Objetivo nutricional perfecto para hoy!';
+                    bar.classList.add('bg-gradient-to-r', 'from-green-400', 'to-emerald-500');
+                    percentEl.classList.remove('text-orange-400', 'text-red-400');
+                    percentEl.classList.add('text-green-400');
+                } else {
+                    msg.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-400 mr-1"></i> Cuidado, has superado las calorías recomendadas.';
+                    bar.classList.add('bg-gradient-to-r', 'from-red-400', 'to-red-600');
+                    percentEl.classList.remove('text-orange-400', 'text-green-400');
+                    percentEl.classList.add('text-red-400');
+                }
+            } else {
+                percentEl.textContent = '0%';
+                bar.style.width = '0%';
+                bar.className = 'h-full bg-slate-600 rounded-full transition-all';
+                msg.innerHTML = '<i class="fa-solid fa-bell text-orange-400 mr-1"></i> Configura el perfil para ver el objetivo diario.';
+            }
+        }
+    </script>
+</body>
+</html>
