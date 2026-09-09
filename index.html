@@ -10,9 +10,8 @@
     <style>
         body {
             font-family: 'Nunito', sans-serif;
-            background-color: #fffaf0; /* Soft orange/cream background */
+            background-color: #fffaf0;
         }
-        /* Custom scrollbar for small lists */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
@@ -27,43 +26,57 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8; 
         }
+        /* Estilos para ocultar pestañas inactivas */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        primary: '#f97316', // Orange-500
-                        secondary: '#14b8a6', // Teal-500
+                        primary: '#f97316',
+                        secondary: '#14b8a6',
                     }
                 }
             }
         }
     </script>
+    <script>
+        // Aplicar el tema antes de renderizar la página para evitar destellos blancos
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </head>
-<body class="text-slate-700 min-h-screen pb-12">
+<body class="text-slate-700 dark:text-slate-300 bg-[#fffaf0] dark:bg-slate-900 min-h-screen pb-12 transition-colors duration-300">
 
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-orange-100 sticky top-0 z-10">
+    <header class="bg-white dark:bg-slate-800 shadow-sm border-b border-orange-100 dark:border-slate-700 sticky top-0 z-10 transition-colors duration-300">
         <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-primary text-xl">
+                <div class="w-10 h-10 bg-orange-100 dark:bg-slate-700 rounded-full flex items-center justify-center text-primary text-xl transition-colors duration-300">
                     <i class="fa-solid fa-cat"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-800 leading-tight">MiauMenú</h1>
-                    <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Nutrición & Horarios</p>
+                    <h1 class="text-2xl font-bold text-slate-800 dark:text-white leading-tight">MiauMenú</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Nutrición & Horarios</p>
                 </div>
             </div>
-            <button onclick="resetData()" class="text-sm text-red-400 hover:text-red-600 font-semibold flex items-center gap-2 transition-colors">
-                <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">Reiniciar Datos</span>
-            </button>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-yellow-400 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+                <button onclick="resetData()" class="text-sm text-red-400 hover:text-red-600 dark:hover:text-red-300 font-semibold flex items-center gap-2 transition-colors">
+                    <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">Reiniciar</span>
+                </button>
+            </div>
         </div>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 mt-8">
         
-        <!-- Notificación toast (oculta por defecto) -->
         <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-lg transform transition-transform duration-300 translate-y-20 opacity-0 z-50 flex items-center gap-3">
             <i class="fa-solid fa-circle-check text-green-400"></i>
             <span id="toast-message">Guardado con éxito</span>
@@ -73,37 +86,36 @@
             
             <!-- COLUMNA IZQUIERDA (Perfil y Marcas) -->
             <div class="lg:col-span-5 space-y-8">
-                
                 <!-- Sección 1: Análisis del Gato -->
-                <section class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-[100px] -z-0"></div>
+                <section class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden transition-colors duration-300">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-orange-50 dark:bg-slate-700/50 rounded-bl-[100px] -z-0"></div>
                     
                     <div class="relative z-10">
                         <div class="flex items-center gap-3 mb-6">
                             <i class="fa-solid fa-id-card text-2xl text-primary"></i>
-                            <h2 class="text-xl font-bold text-slate-800">Perfil del Gato</h2>
+                            <h2 class="text-xl font-bold text-slate-800 dark:text-white">Perfil del Gato</h2>
                         </div>
 
                         <form id="profile-form" class="space-y-4">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-bold text-slate-600 mb-1">Nombre</label>
-                                    <input type="text" id="cat-name" placeholder="Ej. Michi" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all">
+                                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Nombre</label>
+                                    <input type="text" id="cat-name" placeholder="Ej. Michi" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary dark:text-white transition-all">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-bold text-slate-600 mb-1">Raza</label>
-                                    <input type="text" id="cat-breed" placeholder="Ej. Europeo" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all">
+                                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Raza</label>
+                                    <input type="text" id="cat-breed" placeholder="Ej. Europeo" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary dark:text-white transition-all">
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-bold text-slate-600 mb-1">Peso (kg)</label>
-                                    <input type="number" step="0.1" id="cat-weight" placeholder="Ej. 4.5" required class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all">
+                                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Peso (kg)</label>
+                                    <input type="number" step="0.1" id="cat-weight" placeholder="Ej. 4.5" required class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary dark:text-white transition-all">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-bold text-slate-600 mb-1">Actividad</label>
-                                    <select id="cat-activity" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm">
+                                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Actividad</label>
+                                    <select id="cat-activity" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary dark:text-white transition-all text-sm">
                                         <option value="1.2">Esterilizado / Sedentario (1.2)</option>
                                         <option value="1.4">Activo / Intacto (1.4)</option>
                                         <option value="0.8">Pérdida de peso (0.8)</option>
@@ -117,172 +129,241 @@
                             </button>
                         </form>
 
-                        <div id="profile-result" class="mt-5 hidden bg-orange-50 border border-orange-100 p-4 rounded-xl text-center">
-                            <p class="text-sm text-slate-600 mb-1">Calorías diarias recomendadas para <span id="display-name" class="font-bold">tu gato</span>:</p>
+                        <div id="profile-result" class="mt-5 hidden bg-orange-50 dark:bg-slate-700/50 border border-orange-100 dark:border-slate-600 p-4 rounded-xl text-center">
+                            <p class="text-sm text-slate-600 dark:text-slate-300 mb-1">Calorías diarias para <span id="display-name" class="font-bold text-slate-800 dark:text-white">tu gato</span>:</p>
                             <p class="text-3xl font-extrabold text-primary" id="display-kcal">0 <span class="text-lg text-orange-400 font-bold">kcal</span></p>
-                            <p class="text-xs text-slate-500 mt-2"><i class="fa-solid fa-info-circle"></i> Basado en requerimiento energético en reposo (RER).</p>
                         </div>
                     </div>
                 </section>
 
                 <!-- Sección 2: Base de datos de Comida -->
-                <section class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+                <section class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 transition-colors duration-300">
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-3">
                             <i class="fa-solid fa-bowl-food text-2xl text-secondary"></i>
-                            <h2 class="text-xl font-bold text-slate-800">Marcas de Comida</h2>
+                            <h2 class="text-xl font-bold text-slate-800 dark:text-white">Marcas de Comida</h2>
                         </div>
-                        <span class="bg-teal-50 text-teal-600 text-xs font-bold px-2 py-1 rounded-lg" id="food-count">0 guardadas</span>
+                        <span class="bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 text-xs font-bold px-2 py-1 rounded-lg" id="food-count">0 guardadas</span>
                     </div>
 
-                    <form id="food-form" class="space-y-4 mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <form id="food-form" class="space-y-4 mb-6 bg-slate-50 dark:bg-slate-700/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-600">
                         <div class="grid grid-cols-2 gap-3">
                             <div class="col-span-2">
-                                <label class="block text-xs font-bold text-slate-500 mb-1">Nombre / Marca</label>
-                                <input type="text" id="food-brand" placeholder="Ej. Orijen Fit & Trim" required class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-secondary">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Nombre / Marca</label>
+                                <input type="text" id="food-brand" required class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-secondary dark:text-white">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1">Tipo</label>
-                                <select id="food-type" class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-secondary">
-                                    <option value="Seca">Seca (Pienso)</option>
-                                    <option value="Húmeda">Húmeda (Lata/Sobres)</option>
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Tipo</label>
+                                <select id="food-type" class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-secondary dark:text-white">
+                                    <option value="Seca">Seca</option>
+                                    <option value="Húmeda">Húmeda</option>
                                     <option value="Snack">Snack</option>
                                     <option value="Casera">Casera/Barf</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1">Kcal por 100g</label>
-                                <input type="number" step="0.1" id="food-kcal" placeholder="Ej. 370" required class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-secondary">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Kcal/100g</label>
+                                <input type="number" step="0.1" id="food-kcal" required class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-secondary dark:text-white">
                             </div>
                         </div>
                         <button type="submit" class="w-full bg-secondary hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors">
-                            <i class="fa-solid fa-plus mr-1"></i> Añadir Comida a la despensa
+                            Añadir Comida
                         </button>
                     </form>
 
-                    <!-- Lista de Comidas -->
                     <div id="food-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2">
-                        <!-- Las comidas se renderizarán aquí -->
-                        <p class="text-sm text-slate-400 text-center py-4 italic">No has añadido ninguna comida aún. Añade los alimentos que suele comer tu gato arriba.</p>
+                        <!-- Comidas -->
                     </div>
                 </section>
             </div>
 
-            <!-- COLUMNA DERECHA (Progreso y Horario) -->
-            <div class="lg:col-span-7 space-y-8">
+            <!-- COLUMNA DERECHA (Progreso y Calendario) -->
+            <div class="lg:col-span-7 space-y-4">
                 
-                <!-- Sección 3: Análisis y Progreso Diario -->
-                <section class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-6 shadow-lg text-white relative overflow-hidden">
-                    <i class="fa-solid fa-chart-pie absolute -right-6 -bottom-6 text-9xl text-white opacity-5"></i>
-                    
-                    <h2 class="text-xl font-bold mb-6 flex items-center gap-3">
-                        <i class="fa-solid fa-chart-simple text-orange-400"></i> Análisis Diario
-                    </h2>
+                <!-- Pestañas -->
+                <div class="flex gap-2 bg-slate-200/50 dark:bg-slate-800 p-1 rounded-2xl transition-colors duration-300">
+                    <button onclick="switchTab('daily-tab')" id="btn-daily-tab" class="flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white">
+                        <i class="fa-solid fa-list-check mr-2 text-indigo-500 dark:text-indigo-400"></i> Plan Diario
+                    </button>
+                    <button onclick="switchTab('calendar-tab')" id="btn-calendar-tab" class="flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+                        <i class="fa-solid fa-calendar-days mr-2 text-indigo-500 dark:text-indigo-400"></i> Calendario Mensual
+                    </button>
+                </div>
 
-                    <div class="flex items-end justify-between mb-2">
-                        <div>
-                            <p class="text-slate-300 text-sm font-semibold mb-1">Kcal Consumidas / Objetivo</p>
-                            <p class="text-3xl font-black text-white"><span id="progress-current">0</span> <span class="text-lg text-slate-400 font-bold">/ <span id="progress-goal">0</span> kcal</span></p>
+                <!-- CONTENIDO: PLAN DIARIO -->
+                <div id="daily-tab" class="tab-content active space-y-8">
+                    <!-- Selector de Día Activo -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700 flex justify-between items-center transition-colors duration-300">
+                        <button onclick="changeDay(-1)" class="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <div class="text-center">
+                            <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Día Seleccionado</p>
+                            <h3 class="text-xl font-black text-indigo-600 dark:text-indigo-400" id="current-date-display">Hoy</h3>
                         </div>
-                        <div class="text-right">
-                            <p class="text-4xl font-black text-orange-400" id="progress-percent">0%</p>
-                        </div>
+                        <button onclick="changeDay(1)" class="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
                     </div>
 
-                    <!-- Barra de progreso -->
-                    <div class="h-6 bg-slate-700 rounded-full mt-4 overflow-hidden relative">
-                        <div id="progress-bar" class="h-full bg-gradient-to-r from-orange-400 to-primary rounded-full transition-all duration-700 ease-out flex items-center justify-end px-2" style="width: 0%;">
-                            <i class="fa-solid fa-cat text-white text-xs opacity-70"></i>
-                        </div>
-                    </div>
-                    
-                    <!-- Mensaje dinámico de progreso -->
-                    <p id="progress-msg" class="text-sm text-slate-300 mt-4 text-center font-medium bg-slate-800 py-2 rounded-xl border border-slate-700">
-                        <i class="fa-solid fa-bell text-orange-400 mr-1"></i> Configura el perfil para ver el objetivo diario.
-                    </p>
-                </section>
-
-                <!-- Sección 4: Calendario / Horarios -->
-                <section class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-regular fa-calendar-check text-2xl text-indigo-500"></i>
-                            <h2 class="text-xl font-bold text-slate-800">Horario de Comidas</h2>
-                        </div>
-                    </div>
-
-                    <!-- Formulario Nuevo Horario -->
-                    <form id="schedule-form" class="flex flex-col sm:flex-row gap-3 mb-8 bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
-                        <div class="w-full sm:w-1/4">
-                            <label class="block text-xs font-bold text-slate-500 mb-1">Hora</label>
-                            <input type="time" id="meal-time" required class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-400 font-bold text-slate-700">
-                        </div>
-                        <div class="w-full sm:w-2/4">
-                            <label class="block text-xs font-bold text-slate-500 mb-1">Comida</label>
-                            <select id="meal-food" required class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-400">
-                                <option value="" disabled selected>Selecciona marca...</option>
-                                <!-- Se llena dinámicamente -->
-                            </select>
-                        </div>
-                        <div class="w-full sm:w-1/4">
-                            <label class="block text-xs font-bold text-slate-500 mb-1">Gramos (g)</label>
-                            <input type="number" id="meal-amount" min="1" placeholder="Ej. 40" required class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-400">
-                        </div>
-                        <div class="w-full sm:w-auto flex items-end">
-                            <button type="submit" class="w-full h-[38px] bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-4 rounded-lg text-sm transition-colors">
-                                <i class="fa-solid fa-plus"></i>
-                            </button>
-                        </div>
-                    </form>
-
-                    <!-- Lista del Calendario Diario -->
-                    <div class="relative">
-                        <!-- Linea de tiempo visual -->
-                        <div class="absolute left-[39px] top-4 bottom-4 w-0.5 bg-indigo-100 hidden sm:block"></div>
-                        
-                        <div id="schedule-list" class="space-y-4">
-                            <!-- Los horarios se renderizan aquí -->
-                            <div class="text-center py-8">
-                                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 text-slate-300 mb-3 text-2xl">
-                                    <i class="fa-regular fa-clock"></i>
-                                </div>
-                                <p class="text-slate-500 font-semibold">Aún no hay comidas programadas</p>
-                                <p class="text-sm text-slate-400">Añade raciones al menú de hoy.</p>
+                    <!-- Progreso del Día -->
+                    <section class="bg-gradient-to-br from-slate-800 to-slate-900 dark:from-slate-900 dark:to-black rounded-3xl p-6 shadow-lg text-white border border-transparent dark:border-slate-800 transition-colors duration-300">
+                        <h2 class="text-xl font-bold mb-4 flex items-center gap-3">
+                            <i class="fa-solid fa-chart-simple text-orange-400"></i> Consumo de hoy
+                        </h2>
+                        <div class="flex items-end justify-between mb-2">
+                            <div>
+                                <p class="text-3xl font-black text-white"><span id="progress-current">0</span> <span class="text-lg text-slate-400 font-bold">/ <span id="progress-goal">0</span> kcal</span></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-4xl font-black text-orange-400" id="progress-percent">0%</p>
                             </div>
                         </div>
-                    </div>
-                </section>
+                        <div class="h-6 bg-slate-700 dark:bg-slate-800 rounded-full mt-4 overflow-hidden relative">
+                            <div id="progress-bar" class="h-full bg-slate-600 rounded-full transition-all duration-700 ease-out" style="width: 0%;"></div>
+                        </div>
+                        <p id="progress-msg" class="text-sm text-slate-300 mt-4 text-center font-medium bg-slate-800 dark:bg-slate-900/50 py-2 rounded-xl border border-transparent dark:border-slate-800"></p>
+                    </section>
+
+                    <!-- Horario / Lista -->
+                    <section class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 transition-colors duration-300">
+                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+                            <i class="fa-regular fa-clock text-indigo-500 dark:text-indigo-400"></i> Raciones
+                        </h2>
+
+                        <form id="schedule-form" class="flex flex-col sm:flex-row gap-3 mb-8 bg-indigo-50 dark:bg-slate-700/50 p-4 rounded-2xl border border-transparent dark:border-slate-600">
+                            <div class="w-full sm:w-1/4">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Hora</label>
+                                <input type="time" id="meal-time" required class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg dark:text-white">
+                            </div>
+                            <div class="w-full sm:w-2/4">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Comida</label>
+                                <select id="meal-food" required class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg dark:text-white"></select>
+                            </div>
+                            <div class="w-full sm:w-1/4">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Gramos</label>
+                                <input type="number" id="meal-amount" min="1" required class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg dark:text-white">
+                            </div>
+                            <div class="w-full sm:w-auto flex items-end">
+                                <button type="submit" class="w-full h-[38px] bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-4 rounded-lg">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                        </form>
+
+                        <div id="schedule-list" class="space-y-4"></div>
+                    </section>
+                </div>
+
+                <!-- CONTENIDO: CALENDARIO MENSUAL -->
+                <div id="calendar-tab" class="tab-content">
+                    <section class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 transition-colors duration-300">
+                        <!-- Cabecera del Calendario -->
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                                <i class="fa-solid fa-calendar-alt text-indigo-500 dark:text-indigo-400"></i> Vista Mensual
+                            </h2>
+                            <div class="flex items-center gap-4">
+                                <button onclick="changeMonth(-1)" class="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </button>
+                                <h3 id="calendar-month-display" class="font-bold text-lg w-32 text-center capitalize dark:text-white">Octubre 2023</h3>
+                                <button onclick="changeMonth(1)" class="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Leyenda -->
+                        <div class="flex justify-center gap-4 mb-6 text-xs font-bold text-slate-500 dark:text-slate-400">
+                            <div class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-slate-100 dark:bg-slate-700"></span> Sin datos</div>
+                            <div class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-orange-200 dark:bg-orange-900/50"></span> Falta comida</div>
+                            <div class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-green-400 dark:bg-green-700/50"></span> Perfecto</div>
+                            <div class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-red-400 dark:bg-red-800/50"></span> Exceso</div>
+                        </div>
+
+                        <!-- Grid Calendario -->
+                        <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-400 mb-2">
+                            <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
+                        </div>
+                        <div id="calendar-grid" class="grid grid-cols-7 gap-2">
+                            <!-- Días generados por JS -->
+                        </div>
+                    </section>
+                </div>
 
             </div>
         </div>
     </main>
 
+    <style>
+        /* Arreglo para el icono del input tipo 'time' en modo oscuro */
+        .dark input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.8);
+        }
+    </style>
+
     <script>
-        // --- ESTADO DE LA APLICACIÓN ---
+        // --- STREAMING_CHUNK: Actualizando el estado para soportar fechas... ---
+        // ESTADO
         let appData = {
-            profile: {
-                name: '',
-                breed: '',
-                weight: null,
-                activity: '1.2',
-                dailyGoal: 0
-            },
-            foods: [], // { id, brand, type, kcal }
-            schedule: [] // { id, time, foodId, amount, totalKcal }
+            profile: { name: '', breed: '', weight: null, activity: '1.2', dailyGoal: 0 },
+            foods: [],
+            // schedule ahora es un diccionario: { "YYYY-MM-DD": [ {meal1}, {meal2} ] }
+            scheduleByDate: {} 
         };
 
-        // --- INICIALIZACIÓN ---
+        let currentDate = new Date(); // Día seleccionado en Plan Diario
+        let calendarDate = new Date(); // Mes mostrado en Pestaña Calendario
+
+        // INICIALIZACIÓN
         document.addEventListener('DOMContentLoaded', () => {
-            loadData();
+            // Inicializar icono de tema
+            const isDark = document.documentElement.classList.contains('dark');
+            updateThemeIcon(isDark);
+
+            // Compatibilidad con versión anterior
+            const saved = localStorage.getItem('miauMenuData');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed.schedule)) {
+                    // Migrar array plano viejo al formato por fechas usando la fecha actual
+                    const todayStr = formatDate(new Date());
+                    appData = {
+                        ...parsed,
+                        scheduleByDate: { [todayStr]: parsed.schedule }
+                    };
+                    delete appData.schedule;
+                } else {
+                    appData = parsed;
+                }
+            }
             setupEventListeners();
             updateAllUI();
         });
 
-        function loadData() {
-            const saved = localStorage.getItem('miauMenuData');
-            if (saved) {
-                appData = JSON.parse(saved);
-            }
+        // HELPERS DE FECHAS
+        function formatDate(dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+        
+        function getDisplayDate(dateObj) {
+            const todayStr = formatDate(new Date());
+            const dateStr = formatDate(dateObj);
+            
+            if (dateStr === todayStr) return "Hoy";
+            
+            const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+            if (dateStr === formatDate(tomorrow)) return "Mañana";
+            
+            const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+            if (dateStr === formatDate(yesterday)) return "Ayer";
+
+            const options = { weekday: 'short', day: 'numeric', month: 'short' };
+            return dateObj.toLocaleDateString('es-ES', options);
         }
 
         function saveData() {
@@ -290,117 +371,157 @@
             updateAllUI();
         }
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-message').textContent = message;
-            
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = msg;
+            t.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => t.classList.add('translate-y-20', 'opacity-0'), 3000);
         }
 
         function resetData() {
-            // Reemplazamos confirm() por un modal custom o UI, pero para simplificar sin confirm(), 
-            // usar un reinicio con doble clic o simplemente resetear.
             appData = {
                 profile: { name: '', breed: '', weight: null, activity: '1.2', dailyGoal: 0 },
                 foods: [],
-                schedule: []
+                scheduleByDate: {}
             };
+            currentDate = new Date();
             saveData();
             document.getElementById('profile-form').reset();
-            showToast("Datos borrados. Empezando de cero.");
+            showToast("Datos reiniciados");
         }
 
-        // --- STREAMING_CHUNK: Programando el cálculo de calorías y perfil... ---
+        // TEMA OSCURO / CLARO
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon(isDark);
+        }
+
+        function updateThemeIcon(isDark) {
+            const icon = document.getElementById('theme-icon');
+            if (isDark) {
+                icon.className = 'fa-solid fa-sun';
+                icon.parentElement.classList.replace('text-slate-500', 'text-yellow-400');
+            } else {
+                icon.className = 'fa-solid fa-moon';
+                icon.parentElement.classList.replace('text-yellow-400', 'text-slate-500');
+            }
+        }
+
+        // INTERACCIÓN UI
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+
+            const inactiveClasses = "flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200";
+            const activeClasses = "flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white";
+
+            document.getElementById('btn-daily-tab').className = inactiveClasses;
+            document.getElementById('btn-calendar-tab').className = inactiveClasses;
+            
+            if(tabId === 'daily-tab') {
+                document.getElementById('btn-daily-tab').className = activeClasses;
+            } else {
+                document.getElementById('btn-calendar-tab').className = activeClasses;
+                renderCalendar(); // Refrescar calendario al abrir
+            }
+        }
+
+        function changeDay(offset) {
+            currentDate.setDate(currentDate.getDate() + offset);
+            updateDailyUI();
+        }
+
+        function changeMonth(offset) {
+            calendarDate.setMonth(calendarDate.getMonth() + offset);
+            renderCalendar();
+        }
+
+        // EVENT LISTENERS
         function setupEventListeners() {
-            // Perfil Submit
             document.getElementById('profile-form').addEventListener('submit', (e) => {
                 e.preventDefault();
-                const weight = parseFloat(document.getElementById('cat-weight').value);
-                const activity = parseFloat(document.getElementById('cat-activity').value);
-                
-                // Fórmula RER (Requerimiento Energético en Reposo): 70 * (Peso en kg ^ 0.75)
-                const rer = 70 * Math.pow(weight, 0.75);
-                const dailyKcal = Math.round(rer * activity);
+                const w = parseFloat(document.getElementById('cat-weight').value);
+                const act = parseFloat(document.getElementById('cat-activity').value);
+                const dailyKcal = Math.round((70 * Math.pow(w, 0.75)) * act);
 
                 appData.profile = {
                     name: document.getElementById('cat-name').value || 'Tu gato',
                     breed: document.getElementById('cat-breed').value,
-                    weight: weight,
+                    weight: w,
                     activity: document.getElementById('cat-activity').value,
                     dailyGoal: dailyKcal
                 };
-                
                 saveData();
-                showToast("Perfil actualizado y calorías calculadas");
+                showToast("Perfil actualizado");
             });
 
-            // Comida Submit
             document.getElementById('food-form').addEventListener('submit', (e) => {
                 e.preventDefault();
-                const newFood = {
+                appData.foods.push({
                     id: Date.now().toString(),
                     brand: document.getElementById('food-brand').value,
                     type: document.getElementById('food-type').value,
                     kcal: parseFloat(document.getElementById('food-kcal').value)
-                };
-                
-                appData.foods.push(newFood);
+                });
                 document.getElementById('food-form').reset();
                 saveData();
-                showToast("Nueva marca añadida a la despensa");
+                showToast("Comida añadida");
             });
 
-            // Horario Submit
             document.getElementById('schedule-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const foodId = document.getElementById('meal-food').value;
-                if (!foodId) {
-                    showToast("Por favor, selecciona una comida");
-                    return;
-                }
+                if (!foodId) return showToast("Selecciona una comida");
 
                 const food = appData.foods.find(f => f.id === foodId);
                 const amount = parseFloat(document.getElementById('meal-amount').value);
                 
-                // Cálculo: (kcal por 100g / 100) * gramos
-                const mealKcal = Math.round((food.kcal / 100) * amount);
+                const dateStr = formatDate(currentDate);
+                if (!appData.scheduleByDate[dateStr]) {
+                    appData.scheduleByDate[dateStr] = [];
+                }
 
-                const newMeal = {
+                appData.scheduleByDate[dateStr].push({
                     id: Date.now().toString(),
                     time: document.getElementById('meal-time').value,
                     foodId: foodId,
                     amount: amount,
-                    totalKcal: mealKcal
-                };
-
-                appData.schedule.push(newMeal);
+                    totalKcal: Math.round((food.kcal / 100) * amount)
+                });
+                
                 document.getElementById('schedule-form').reset();
                 saveData();
-                showToast("Comida añadida al horario");
+                showToast("Comida programada");
             });
         }
 
         function deleteFood(id) {
             appData.foods = appData.foods.filter(f => f.id !== id);
-            // También deberíamos eliminar o alertar si hay horarios con esta comida
-            appData.schedule = appData.schedule.filter(s => s.foodId !== id);
             saveData();
-            showToast("Marca eliminada");
         }
 
         function deleteMeal(id) {
-            appData.schedule = appData.schedule.filter(s => s.id !== id);
-            saveData();
-            showToast("Comida removida del horario");
+            const dateStr = formatDate(currentDate);
+            if(appData.scheduleByDate[dateStr]) {
+                appData.scheduleByDate[dateStr] = appData.scheduleByDate[dateStr].filter(s => s.id !== id);
+                saveData();
+            }
         }
 
-        // --- STREAMING_CHUNK: Conectando la interfaz con los datos interactivos... ---
+        // --- STREAMING_CHUNK: Funciones de renderizado UI... ---
         function updateAllUI() {
             renderProfile();
             renderFoods();
+            updateDailyUI();
+            if(document.getElementById('calendar-tab').classList.contains('active')){
+                renderCalendar();
+            }
+        }
+
+        function updateDailyUI() {
+            document.getElementById('current-date-display').textContent = getDisplayDate(currentDate);
             renderSchedule();
             renderProgress();
         }
@@ -411,9 +532,8 @@
                 document.getElementById('cat-breed').value = appData.profile.breed;
                 document.getElementById('cat-weight').value = appData.profile.weight;
                 document.getElementById('cat-activity').value = appData.profile.activity;
-                
                 document.getElementById('display-name').textContent = appData.profile.name;
-                document.getElementById('display-kcal').innerHTML = `${appData.profile.dailyGoal} <span class="text-lg text-orange-400 font-bold">kcal</span>`;
+                document.getElementById('display-kcal').innerHTML = `${appData.profile.dailyGoal} <span class="text-lg text-orange-400">kcal</span>`;
                 document.getElementById('profile-result').classList.remove('hidden');
             } else {
                 document.getElementById('profile-result').classList.add('hidden');
@@ -423,12 +543,11 @@
         function renderFoods() {
             const list = document.getElementById('food-list');
             const select = document.getElementById('meal-food');
-            
             document.getElementById('food-count').textContent = `${appData.foods.length} guardadas`;
             
             if (appData.foods.length === 0) {
-                list.innerHTML = '<p class="text-sm text-slate-400 text-center py-4 italic">No has añadido ninguna comida aún.</p>';
-                select.innerHTML = '<option value="" disabled selected>Añade una marca primero</option>';
+                list.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">Sin comidas guardadas.</p>';
+                select.innerHTML = '<option value="" disabled selected>Añade marca primero</option>';
                 select.disabled = true;
                 return;
             }
@@ -438,102 +557,59 @@
             select.innerHTML = '<option value="" disabled selected>Selecciona marca...</option>';
 
             appData.foods.forEach(food => {
-                // Icono según tipo
-                let icon = 'fa-bone';
-                if (food.type === 'Húmeda') icon = 'fa-fish';
-                if (food.type === 'Seca') icon = 'fa-cubes-stacked';
-                if (food.type === 'Casera') icon = 'fa-drumstick-bite';
-
-                // Añadir a la lista visual
-                const item = document.createElement('div');
-                item.className = 'flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-secondary/30 transition-colors';
-                item.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-sm">
-                            <i class="fa-solid ${icon}"></i>
-                        </div>
+                list.innerHTML += `
+                    <div class="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-100 dark:border-slate-600">
                         <div>
-                            <p class="text-sm font-bold text-slate-700">${food.brand}</p>
-                            <p class="text-xs text-slate-500">${food.type} &bull; <span class="font-semibold text-secondary">${food.kcal} kcal/100g</span></p>
+                            <p class="text-sm font-bold text-slate-700 dark:text-slate-200">${food.brand}</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">${food.type} • ${food.kcal} kcal/100g</p>
                         </div>
-                    </div>
-                    <button onclick="deleteFood('${food.id}')" class="text-slate-300 hover:text-red-500 transition-colors px-2">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                `;
-                list.appendChild(item);
-
-                // Añadir al selector del horario
-                const option = document.createElement('option');
-                option.value = food.id;
-                option.textContent = `${food.brand} (${food.type})`;
-                select.appendChild(option);
+                        <button onclick="deleteFood('${food.id}')" class="text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>`;
+                select.innerHTML += `<option value="${food.id}">${food.brand}</option>`;
             });
         }
 
         function renderSchedule() {
             const list = document.getElementById('schedule-list');
-            
-            if (appData.schedule.length === 0) {
-                list.innerHTML = `
-                    <div class="text-center py-8">
-                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 text-slate-300 mb-3 text-2xl">
-                            <i class="fa-regular fa-clock"></i>
-                        </div>
-                        <p class="text-slate-500 font-semibold">Aún no hay comidas programadas</p>
-                        <p class="text-sm text-slate-400">Añade raciones al menú de hoy.</p>
-                    </div>`;
+            const dateStr = formatDate(currentDate);
+            const todaysMeals = appData.scheduleByDate[dateStr] || [];
+
+            if (todaysMeals.length === 0) {
+                list.innerHTML = `<p class="text-center text-slate-400 py-8">No hay comidas programadas para este día.</p>`;
                 return;
             }
 
             list.innerHTML = '';
-            
-            // Ordenar por hora
-            const sortedSchedule = [...appData.schedule].sort((a, b) => a.time.localeCompare(b.time));
+            const sortedMeals = [...todaysMeals].sort((a, b) => a.time.localeCompare(b.time));
 
-            sortedSchedule.forEach((meal) => {
+            sortedMeals.forEach(meal => {
                 const food = appData.foods.find(f => f.id === meal.foodId);
-                if (!food) return; // Por si se borró la comida
+                if(!food) return;
 
-                const item = document.createElement('div');
-                item.className = 'relative flex items-center gap-4 sm:gap-6 bg-white sm:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border sm:border-0 border-slate-100 shadow-sm sm:shadow-none';
-                item.innerHTML = `
-                    <!-- Indicador visual de tiempo -->
-                    <div class="hidden sm:flex flex-col items-center z-10 w-20">
-                        <span class="text-lg font-black text-slate-700">${meal.time}</span>
-                    </div>
-                    <div class="hidden sm:block absolute left-[35px] w-2 h-2 rounded-full bg-indigo-500 z-10 ring-4 ring-white"></div>
-                    
-                    <!-- Tarjeta de comida -->
-                    <div class="flex-1 bg-white sm:bg-slate-50 sm:border border-slate-100 p-3 sm:p-4 rounded-2xl flex items-center justify-between sm:hover:shadow-md transition-shadow">
-                        <div class="flex items-center gap-4">
-                            <div class="sm:hidden text-lg font-black text-indigo-500 bg-indigo-50 px-2 py-1 rounded-lg">
-                                ${meal.time}
-                            </div>
+                list.innerHTML += `
+                    <div class="flex items-center justify-between bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-100 dark:border-slate-600">
+                        <div class="flex items-center gap-3">
+                            <span class="font-black text-indigo-500 dark:text-indigo-400">${meal.time}</span>
                             <div>
-                                <p class="font-bold text-slate-800 text-sm sm:text-base">${food.brand}</p>
-                                <p class="text-xs sm:text-sm text-slate-500 font-medium">Ración: <span class="text-slate-700 font-bold">${meal.amount}g</span></p>
+                                <p class="font-bold text-slate-800 dark:text-white text-sm">${food.brand}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">${meal.amount}g</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3 sm:gap-4">
-                            <div class="text-right">
-                                <span class="block text-sm sm:text-lg font-black text-orange-500">+${meal.totalKcal} kcal</span>
-                            </div>
-                            <button onclick="deleteMeal('${meal.id}')" class="w-8 h-8 rounded-full bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center">
-                                <i class="fa-solid fa-xmark text-sm"></i>
-                            </button>
+                        <div class="flex items-center gap-3">
+                            <span class="text-orange-500 dark:text-orange-400 font-bold">+${meal.totalKcal} kcal</span>
+                            <button onclick="deleteMeal('${meal.id}')" class="text-red-300 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400"><i class="fa-solid fa-xmark"></i></button>
                         </div>
-                    </div>
-                `;
-                list.appendChild(item);
+                    </div>`;
             });
         }
 
         function renderProgress() {
             const goal = appData.profile.dailyGoal;
-            document.getElementById('progress-goal').textContent = goal || '0';
+            const dateStr = formatDate(currentDate);
+            const todaysMeals = appData.scheduleByDate[dateStr] || [];
             
-            const currentKcal = appData.schedule.reduce((acc, meal) => acc + meal.totalKcal, 0);
+            document.getElementById('progress-goal').textContent = goal || '0';
+            const currentKcal = todaysMeals.reduce((acc, meal) => acc + meal.totalKcal, 0);
             document.getElementById('progress-current').textContent = currentKcal;
 
             const percentEl = document.getElementById('progress-percent');
@@ -543,36 +619,100 @@
             if (goal > 0) {
                 let percent = Math.round((currentKcal / goal) * 100);
                 percentEl.textContent = `${percent}%`;
-                
-                // Lógica visual de la barra
-                let barWidth = percent > 100 ? 100 : percent;
-                bar.style.width = `${barWidth}%`;
-
-                // Cambiar colores y mensajes según el estado
-                bar.className = 'h-full rounded-full transition-all duration-700 ease-out flex items-center justify-end px-2'; // Reset
+                bar.style.width = `${Math.min(percent, 100)}%`;
                 
                 if (percent === 0) {
-                    msg.innerHTML = '<i class="fa-regular fa-face-frown text-orange-400 mr-1"></i> Aún no ha comido nada.';
-                    bar.classList.add('bg-slate-300');
+                    bar.className = 'h-full bg-slate-600 rounded-full transition-all';
+                    msg.innerHTML = 'Sin datos hoy.';
                 } else if (percent < 90) {
-                    msg.innerHTML = '<i class="fa-solid fa-utensils text-orange-400 mr-1"></i> Va en buen camino.';
-                    bar.classList.add('bg-gradient-to-r', 'from-orange-400', 'to-primary');
+                    bar.className = 'h-full bg-orange-400 rounded-full transition-all';
+                    msg.innerHTML = 'Faltan calorías para llegar al objetivo.';
                 } else if (percent <= 110) {
-                    msg.innerHTML = '<i class="fa-solid fa-cat text-green-400 mr-1"></i> ¡Objetivo nutricional perfecto para hoy!';
-                    bar.classList.add('bg-gradient-to-r', 'from-green-400', 'to-emerald-500');
-                    percentEl.classList.remove('text-orange-400', 'text-red-400');
-                    percentEl.classList.add('text-green-400');
+                    bar.className = 'h-full bg-green-400 rounded-full transition-all';
+                    msg.innerHTML = '¡Objetivo perfecto!';
                 } else {
-                    msg.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-400 mr-1"></i> Cuidado, has superado las calorías recomendadas.';
-                    bar.classList.add('bg-gradient-to-r', 'from-red-400', 'to-red-600');
-                    percentEl.classList.remove('text-orange-400', 'text-green-400');
-                    percentEl.classList.add('text-red-400');
+                    bar.className = 'h-full bg-red-500 rounded-full transition-all';
+                    msg.innerHTML = 'Exceso de calorías.';
                 }
             } else {
                 percentEl.textContent = '0%';
                 bar.style.width = '0%';
-                bar.className = 'h-full bg-slate-600 rounded-full transition-all';
-                msg.innerHTML = '<i class="fa-solid fa-bell text-orange-400 mr-1"></i> Configura el perfil para ver el objetivo diario.';
+                msg.innerHTML = 'Configura el perfil del gato.';
+            }
+        }
+
+        // --- STREAMING_CHUNK: Lógica del calendario mensual visual... ---
+        function renderCalendar() {
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            
+            // Actualizar Título
+            const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+            document.getElementById('calendar-month-display').textContent = `${monthNames[month]} ${year}`;
+
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Ajustar para que lunes sea el primer día (0=Lunes, 6=Domingo)
+            let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+
+            // Rellenar espacios vacíos iniciales
+            for (let i = 0; i < startOffset; i++) {
+                grid.innerHTML += `<div class="p-2"></div>`;
+            }
+
+            const goal = appData.profile.dailyGoal;
+            const todayStr = formatDate(new Date());
+
+            // Días del mes
+            for (let i = 1; i <= daysInMonth; i++) {
+                const cellDate = new Date(year, month, i);
+                const cellDateStr = formatDate(cellDate);
+                
+                const meals = appData.scheduleByDate[cellDateStr] || [];
+                let bgColor = 'bg-slate-50 hover:bg-slate-100 dark:bg-slate-700/30 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300';
+                
+                if (meals.length > 0 && goal > 0) {
+                    const kcals = meals.reduce((acc, m) => acc + m.totalKcal, 0);
+                    const pct = (kcals / goal) * 100;
+                    
+                    if (pct < 90) bgColor = 'bg-orange-100 text-orange-700 hover:bg-orange-200 border-orange-200 dark:bg-orange-900/40 dark:text-orange-400 dark:hover:bg-orange-900/60 dark:border-orange-800/50';
+                    else if (pct <= 110) bgColor = 'bg-green-100 text-green-700 hover:bg-green-200 border-green-200 dark:bg-green-900/40 dark:text-green-400 dark:hover:bg-green-900/60 dark:border-green-800/50';
+                    else bgColor = 'bg-red-100 text-red-700 hover:bg-red-200 border-red-200 dark:bg-red-900/40 dark:text-red-400 dark:hover:bg-red-900/60 dark:border-red-800/50';
+                }
+
+                // Resaltar día de hoy
+                let borderClass = 'border border-transparent dark:border-transparent';
+                if (cellDateStr === todayStr) {
+                    borderClass = 'border-2 border-indigo-500 dark:border-indigo-400';
+                    if (meals.length === 0) bgColor = 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400';
+                }
+
+                // Resaltar día seleccionado actualmente en el plan
+                if(cellDateStr === formatDate(currentDate)) {
+                    borderClass = 'border-2 border-dashed border-slate-400 dark:border-slate-500';
+                }
+
+                // Generar celda clickeable
+                const cell = document.createElement('button');
+                cell.className = `p-2 aspect-square rounded-xl font-bold text-sm flex flex-col items-center justify-center transition-colors cursor-pointer ${bgColor} ${borderClass}`;
+                cell.onclick = () => {
+                    currentDate = new Date(year, month, i);
+                    switchTab('daily-tab'); // Saltar al plan diario
+                    updateDailyUI();
+                };
+                
+                cell.innerHTML = `<span>${i}</span>`;
+                
+                // Si hay comidas, mostrar un indicador mini
+                if (meals.length > 0) {
+                    cell.innerHTML += `<div class="w-1.5 h-1.5 rounded-full bg-current mt-1 opacity-50"></div>`;
+                }
+
+                grid.appendChild(cell);
             }
         }
     </script>
